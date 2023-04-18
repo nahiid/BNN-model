@@ -58,3 +58,19 @@ y_train = torch.from_numpy(y).float()
 for epoch in bar:
     loss = svi.step(x_train, y_train)
     bar.set_postfix(loss=f'{loss / x.shape[0]:.3f}')
+
+
+#Prediction
+
+predictive = Predictive(model, guide=guide, num_samples=500)
+x_test = torch.linspace(-0.5, 1, 3000)
+preds = predictive(x_test)
+
+y_pred = preds['obs'].T.detach().numpy().mean(axis=1)
+y_std = preds['obs'].T.detach().numpy().std(axis=1)
+
+fig, ax = plt.subplots(figsize=(10, 5))
+ax.plot(x, y, 'o', markersize=1)
+ax.plot(x_test, y_pred)
+ax.fill_between(x_test, y_pred - y_std, y_pred + y_std,
+                alpha=0.5, color='#ffcd3c');
