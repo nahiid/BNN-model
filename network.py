@@ -43,3 +43,18 @@ class Model(PyroModule):
         with pyro.plate("data", x.shape[0]):
             obs = pyro.sample("obs", dist.Normal(mu, sigma), obs=y)
         return mu
+
+## Training
+
+model = Model()
+guide = AutoDiagonalNormal(model)
+adam = pyro.optim.Adam({"lr": 1e-3})
+svi = SVI(model, guide, adam, loss=Trace_ELBO())
+
+pyro.clear_param_store()
+bar = trange(20000)
+x_train = torch.from_numpy(x).float()
+y_train = torch.from_numpy(y).float()
+for epoch in bar:
+    loss = svi.step(x_train, y_train)
+    bar.set_postfix(loss=f'{loss / x.shape[0]:.3f}')
