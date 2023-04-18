@@ -61,7 +61,6 @@ for epoch in bar:
 
 
 #Prediction
-
 predictive = Predictive(model, guide=guide, num_samples=500)
 x_test = torch.linspace(-0.5, 1, 3000)
 preds = predictive(x_test)
